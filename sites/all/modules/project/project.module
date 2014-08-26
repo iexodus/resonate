@@ -1,0 +1,741 @@
+<?php
+ /**
+ * Implements hook_permission().
+ */
+ function project_permission() {
+    return array(
+        'administer project' => array(
+            'title' => t('Aminister project'),
+            'description' => t('Add/edit/delete project.'),
+        ),
+    );
+ }
+ 
+ /**
+ * Implements hook_menu().
+ */
+ function project_menu() {
+    $items = array();
+    $items['projects'] = array(
+        'title' => 'Projects',
+        'page callback' => 'projects',
+        'file' => 'project.inc',
+        'access arguments' => array('administer project'),
+        'type' => MENU_CALLBACK
+    );
+     $items['iframe_mile'] = array(
+        'title' => '',
+        'page callback' => 'iframe_mile',
+        'file' => 'project.inc',
+        'access arguments' => array('access content'),
+        'type' => MENU_CALLBACK
+    );
+    $items['templates'] = array(
+        'title' => 'Templates',
+        'page callback' => 'templates',
+        'file' => 'project.inc',
+        'access arguments' => array('administer project'),
+        'type' => MENU_CALLBACK
+    );
+    $items['invite'] = array(
+        'title' => 'Invite',
+        'page callback' => 'invite',
+        'file' => 'project.inc',
+        'access arguments' => array('administer project'),
+        'type' => MENU_CALLBACK
+    );
+    $items['ajax-process'] = array(
+        'title' => 'Ajax process',
+        'page callback' => 'ajax_process',
+        'file' => 'project.inc',
+        'access arguments' => array('administer project'),
+        'type' => MENU_CALLBACK
+    );
+    $items['calendar-events'] = array(
+        'page callback' => 'calendar_events',
+        'file' => 'project.inc',
+        'access arguments' => array('administer project'),
+        'type' => MENU_CALLBACK
+    );
+   	$items['project-sortable'] = array(
+        'page callback' => 'project_sortable',
+            'file' => 'project.inc',
+        'access arguments' => array('administer project'),
+        'type' => MENU_CALLBACK
+    );
+        $items['project-edit/%'] = array(
+        'page callback' => 'project_edit',
+            'file' => 'project.inc',
+        'access arguments' => array('administer project'),
+        'type' => MENU_CALLBACK
+    );
+        $items['accesses/new'] = array(
+        'page callback' => 'accesses_new',
+            'file' => 'project.inc',
+        'access arguments' => array('administer project'),
+        'type' => MENU_CALLBACK
+    );
+        $items['milestone/add'] = array(
+        'page callback' => 'add_milestone',
+        'file' => 'project.inc',
+        'access arguments' => array('administer project'),
+        'type' => MENU_CALLBACK
+    );
+        $items['todolist_filter'] = array(
+        'page callback' => 'todolist_filter',
+        'file' => 'project.inc',
+        'access arguments' => array('access content'),
+        'type' => MENU_CALLBACK
+    );
+        $items['icon_tool_click'] = array(
+        'page callback' => 'icon_tool_click',
+        'file' => 'project.inc',
+        'access arguments' => array('access content'),
+        'type' => MENU_CALLBACK
+    );
+        $items['discover'] = array(
+        'page callback' => 'discover',
+        'file' => 'project.inc',
+        'access arguments' => array('access content'),
+        'type' => MENU_CALLBACK
+    );
+        //zipFilesAndDownload
+        $items['zipfiles_download'] = array(
+        'page callback' => 'zipFilesAndDownload',
+        'file' => 'project.inc',
+        'access arguments' => array('access content'),
+        'type' => MENU_CALLBACK
+    );
+        
+        
+        $items['node/%/calendar'] = array(
+        'page callback' => 'node_project_calendar',
+        'file' => 'project.inc',
+        'access arguments' => array('access content'),
+        'type' => MENU_CALLBACK
+    );
+        
+        
+        $items['node/%/schedule'] = array(
+        'page callback' => 'node_project_schedule',
+        'file' => 'project.inc',
+        'access arguments' => array('access content'),
+        'type' => MENU_CALLBACK
+    );
+        $items['node/%/todo'] = array(
+        'page callback' => 'node_project_todo',
+        'file' => 'project.inc',
+        'access arguments' => array('access content'),
+        'type' => MENU_CALLBACK
+    );
+        $items['node/%/message'] = array(
+        'page callback' => 'node_project_message',
+        'file' => 'project.inc',
+        'access arguments' => array('access content'),
+        'type' => MENU_CALLBACK
+    );
+        $items['node/%/discussion'] = array(
+        'page callback' => 'node_project_discussion',
+        'file' => 'project.inc',
+        'access arguments' => array('access content'),
+        'type' => MENU_CALLBACK
+    );
+        $items['node/%/file'] = array(
+        'page callback' => 'node_project_file',
+        'file' => 'project.inc',
+        'access arguments' => array('access content'),
+        'type' => MENU_CALLBACK
+    );
+        $items['node/%/note'] = array(
+        'page callback' => 'node_project_note',
+        'file' => 'project.inc',
+        'access arguments' => array('access content'),
+        'type' => MENU_CALLBACK
+    );
+        $items['node/%/team'] = array(
+        'page callback' => 'node_project_team',
+        'file' => 'project.inc',
+        'access arguments' => array('access content'),
+        'type' => MENU_CALLBACK
+    );
+        $items['node/%/update_team'] = array(
+        'page callback' => 'node_project_update_team',
+        'file' => 'project.inc',
+        'access arguments' => array('access content'),
+        'type' => MENU_CALLBACK
+    );
+      $items['projects/staff-picks'] = array(
+        'page callback' => 'projects_staff_picks',
+        'file' => 'project.inc',
+        'access arguments' => array('access content'),
+        'type' => MENU_CALLBACK
+    );
+       $items['projects/new'] = array(
+        'page callback' => 'projects_get_new',
+        'file' => 'project.inc',
+        'access arguments' => array('access content'),
+        'type' => MENU_CALLBACK
+    ); 
+       
+    return $items;
+ }
+ 
+ function project_mail($from = 'default_from', $to, $subject, $message) {
+        $my_module = 'project';
+        $my_mail_token = microtime();
+        if ($from == 'default_from') {
+            // Change this to your own default 'from' email address.
+            $from = variable_get('system_mail', 'testemail@iexodus.com');
+        }
+        
+        $message = array(
+            'id' => $my_module . '_' . $my_mail_token,
+            'from'=>$from,
+            'to' => $to,
+            'subject' => $subject,
+            'body' => array($message),
+            'headers' => array(
+                'Content-Type' => 'text/html; charset=UTF-8;', 
+                'From' => $from,
+                'Sender' => $from,
+                'Return-Path' => $from,
+            ),
+        );
+        $system = drupal_mail_system($my_module, $my_mail_token);
+        $message = $system->format($message);
+        if ($system->mail($message)) {
+            return TRUE;
+        } else {
+            return FALSE;
+        }
+    }
+    
+ /**
+ * Implements hook_theme().
+ */
+ function project_theme($existing, $type, $theme, $path) {
+    /* Get path of directory which contains some template files */
+    $path = drupal_get_path("module", "project") . '/themes';
+    return array(
+        'projects' => array(
+            'path' => $path,
+            'template' => 'projects',
+            'variables' => array()
+        ),
+        'templates' => array(
+            'path' => $path,
+            'template' => 'templates',
+            'variables' => array()
+        ),
+        'iframe_mile' => array(
+            'path' => $path,
+            'template' => 'iframe_mile',
+            'variables' => array()
+        ),
+        'add_milestone' => array(
+            'path' => $path,
+            'template' => 'add_milestone',
+            'variables' => array()
+        ),
+        'todolist_filter' => array(
+            'path' => $path,
+            'template' => 'todolist_filter',
+            'variables' => array()
+        ),
+        'milestone_chart' => array(
+            'path' => $path,
+            'template' => 'milestone_chart',
+            'variables' => array()
+        ),
+        //todolists-page-by-list.tpl
+        'todolists_page_by_list' => array(
+            'path' => $path,
+            'template' => 'todolists-page-by-list',
+            'variables' => array()
+        ),
+        'todolist_filter_bylist' => array(
+            'path' => $path,
+            'template' => 'todolist_filter_bylist',
+            'variables' => array()
+        ),
+        'attachments_page_sort' => array(
+            'path' => $path,
+            'template' => 'attachments_page_sort',
+            'variables' => array()
+        ),
+        //member_info.tpl.php
+        'member_info' => array(
+            'path' => $path,
+            'template' => 'member_info',
+            'variables' => array()
+        ),//project_all
+        'project_all' => array(
+            'path' => $path,
+            'template' => 'project_all',
+            'variables' => array()
+        ),
+        //update_team
+        'update_team' => array(
+            'path' => $path,
+            'template' => 'update_team',
+            'variables' => array()
+        ),
+        //add_member_project
+        'add_member_project' => array(
+            'path' => $path,
+            'template' => 'add_member_project',
+            'variables' => array()
+        ),
+    );
+ }
+ 
+  /**
+ * Implements hook_node_delete().
+ */
+ function project_node_delete($node){
+ 	$ds = DIRECTORY_SEPARATOR;
+ 	if($node->type == 'project' || $node->type == 'template'){
+ 		db_query("DELETE FROM tbl_project_attribute WHERE nid = ".$node->nid);
+ 		db_query("DELETE FROM tbl_project_comment WHERE nid = ".$node->nid);
+ 		db_query("DELETE FROM tbl_history WHERE nid = ".$node->nid);
+ 		db_query("DELETE FROM tbl_email_share WHERE nid = ".$node->nid);
+ 		db_query("DELETE FROM tbl_assign_project WHERE nid = ".$node->nid);
+ 		db_query("DELETE FROM tbl_files WHERE nid = ".$node->nid);
+ 		db_query("DELETE FROM tbl_file_label WHERE nid = ".$node->nid);
+ 		db_query("DELETE FROM tbl_todolist WHERE nid = ".$node->nid);
+ 		$path = str_replace('all'.$ds.'modules'.$ds.'project','default'.$ds.'files'.$ds.'projects'.$ds.$node->nid,dirname(__FILE__));
+		$files = glob($path.'/{,.}*', GLOB_BRACE);
+		foreach($files as $file){
+		  if(is_file($file))
+			unlink($file);
+		}
+		if (file_exists($path) && is_dir($path)) {
+			rmdir($path);         
+		} 
+ 	}
+ }
+ 
+ function copy_project($from_id,$to_id){
+	/*Copy assigned user*/
+	$result = db_query("SELECT * FROM tbl_assign_project WHERE nid = ".$from_id);
+	foreach($result as $object)
+		db_insert("tbl_assign_project")->fields(array(
+			'nid' => $to_id,
+			'uid' => $object->uid,
+			'client' => $object->client,
+			'created' => time(),
+			'status' => 0
+		))->execute();
+		
+	/*Copy todo list*/
+	$tids = array(0 => 0);
+	$result = db_query("SELECT * FROM tbl_todolist WHERE nid = ".$from_id);
+	foreach($result as $object){
+		$tid = db_insert("tbl_todolist")->fields(array(
+			'uid' => $object->uid,
+			'nid' => $to_id,
+			'name' => $object->name,
+			'description' => $object->description,
+			'created' => time(),
+			'modified' => time(),
+			'send_client' => $object->send_client,
+			'deleted' => $object->deleted,
+			'completed' => $object->completed,
+                    'weight'=>$object->weight
+		))->execute();
+		$tids[$object->tid] = $tid;
+	}
+	
+	/*Copy project attribute*/
+	$aids = array(0 => 0);
+	$result = db_query("SELECT * FROM tbl_project_attribute WHERE nid = ".$from_id);
+	foreach($result as $object){
+		$aid = db_insert("tbl_project_attribute")->fields(array(
+			'nid' => $to_id,
+			'uid' => $object->uid,
+			'type' => $object->type,
+			'tid' => $tids[$object->tid],
+			'subject' => $object->subject,
+			'description' => $object->description,
+			'created' => time(),
+			'modified' => time(),
+			'send_client' => $object->send_client,
+			'status_send' => $object->status_send,
+			'emails' => $object->emails,
+			'assign_date' => $object->assign_date,
+			'assign_to' => $object->assign_to,
+			'completed' => $object->completed,
+			'completed_by' => $object->completed_by,
+			'completed_date' => $object->completed_date,
+			'deleted' => $object->deleted,
+			'deleted_by' => $object->deleted_by,
+			'deleted_date' => $object->deleted_date,
+                        'weight'=>$object->weight
+		))->execute();
+		$aids[$object->aid] = $aid;
+	}
+	
+	/*Copy times*/
+	$result = db_query("SELECT * FROM tbl_todo_time WHERE nid = ".$from_id);
+	foreach($result as $object){
+		db_insert("tbl_todo_time")->fields(array(
+			'uid' => $object->uid,
+			'nid' => $to_id,
+			'aid' => $aids[$object->aid],
+			'date' => $object->date,
+			'time' => $object->time,
+			'created' => time(),
+			'modified' => time()
+		))->execute();
+	}
+	
+	/*Copy email share*/
+	$result = db_query("SELECT * FROM tbl_email_share WHERE nid = ".$from_id);
+	foreach($result as $object)
+		db_insert("tbl_email_share")->fields(array(
+			'nid' => $to_id,
+			'uid' => $object->uid,
+			'tid' => $tids[$object->tid],
+			'aid' => $aids[$object->aid],
+			'email' => $object->email,
+			'created' => time(),
+            'code'=>  rand_string(15),
+		))->execute();
+		
+	/*Copy comment*/
+	$cids = array(0 => 0);
+	$result = db_query("SELECT * FROM tbl_project_comment WHERE nid = ".$from_id);
+	foreach($result as $object){
+		$cid = db_insert("tbl_project_comment")->fields(array(
+			'tid' => $tids[$object->tid],
+			'aid' => $aids[$object->aid],
+			'nid' => $to_id,
+			'uid' => $object->uid,
+			'content' => $object->content,
+			'created' => time(),
+			'modified' => time(),
+			'action' => $object->action,
+			'deleted' => $object->deleted
+		))->execute();
+		$cids[$object->cid] = $cid;
+	}
+	
+	/*Copy files*/
+	$fids = array(0 => 0);
+	$result = db_query("SELECT * FROM tbl_files WHERE nid = ".$from_id);
+	foreach($result as $object){
+		$fid = db_insert("tbl_files")->fields(array(
+			'nid' => $to_id,
+			'uid' => $object->uid,
+			'tid' => $tids[$object->tid],
+			'aid' => $aids[$object->aid],
+			'cid' => $cids[$object->cid],
+			'name' => $object->name,
+			'path' => $object->path,
+			'size' => $object->size,
+			'type' => $object->type,
+			'created' => time(),
+			'deleted' => $object->deleted
+		))->execute();
+		$fids[$object->fid] = $fid;
+	}
+	$ds = DIRECTORY_SEPARATOR;
+	$path = str_replace('all'.$ds.'modules'.$ds.'project','default'.$ds.'files'.$ds.'projects',dirname(__FILE__));
+	copy_directory($path.$ds.$from_id,$path.$ds.$to_id);
+	/*Copy file label*/
+	$result = db_query("SELECT * FROM tbl_file_label WHERE nid = ".$from_id);
+	foreach($result as $object)
+		db_insert("tbl_file_label")->fields(array(
+			'nid' => $to_id,
+			'fid' => $fids[$object->fid],
+			'label' => $object->label
+		))->execute();
+        
+       
+	/*copy history*/
+       $result = db_query("SELECT * FROM tbl_history WHERE nid =$from_id AND link !='node/".$from_id."'");
+                        while ($info = $result->fetchAssoc()) {
+                            $fields_history = $info;
+                            $fields_history['id'] = 0;
+                            $fields_history['nid'] = $to_id;
+                            $fields_history['created'] = time();
+                           db_insert('tbl_history')->fields($fields_history)->execute();
+                        }
+ }
+ 
+ function copy_directory($src,$dst) {
+    $dir = opendir($src);
+    @mkdir($dst);
+    while(false !== ( $file = readdir($dir)) ) {
+        if (( $file != '.' ) && ( $file != '..' )) {
+            if ( is_dir($src . '/' . $file) ) {
+                recurse_copy($src . '/' . $file,$dst . '/' . $file);
+            }
+            else {
+                copy($src . '/' . $file,$dst . '/' . $file);
+            }
+        }
+    }
+    closedir($dir);
+ } 
+
+ function get_avatar() {
+    $avatars = array('avatar_1.gif', 'avatar_2.gif', 'avatar_3.gif', 'avatar_4.gif', 'avatar_5.gif', 'avatar_6.gif', 'avatar_7.gif', 'avatar_8.gif', 'avatar_9.gif', 'avatar_10.gif', 'avatar_11.gif');
+	$rand = array_rand($avatars, 1);
+    return $avatars[$rand];
+ }
+
+ function time_ago($ptime){
+ 	$months = array("Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec");
+	$days = array("Sunday","Monday","Tuesday","Wednesday","Thusday","Friday","Saturday");
+	$y = date('Y');
+	$m = date('n');
+	$d = date('j');
+	$day = date('w');
+	$h = date('H');
+	$i = date('i');
+	$s = date('s');
+	$t_y = date('Y',$ptime);
+	$t_m = date('n',$ptime);
+	$t_d = date('j',$ptime);
+	$t_day = date('w',$ptime);
+	$t_h = date('H',$ptime);
+	$t_i = date('i',$ptime);
+	$t_s = date('s',$ptime);
+	$result = '';
+	if($y > $t_y){
+		$result = $months[$t_m-1] . ' ' . $t_d . ', ' . $t_y;
+	}
+	else if($y == $t_y){
+		if($m > $t_m){
+			$result = $months[$t_m-1] . ' ' . $t_d;
+		}
+		else if($m == $t_m){
+			if($d > $t_d){
+				$period = $d - $t_d;
+				if($period == 1){
+					$result = 'yesterday at ';
+					if($t_h > 12)
+						$result .= $t_h - 12;
+					else $result .= $t_h;
+					$result .= ':' . $t_m;
+					if($t_h>=12)
+						$result .= 'pm';
+					else $result .= 'am';
+				}
+				else{
+					if($day > $t_day){
+						if($period < 7){
+							$result = $period . ' days ago';
+						}
+						else{
+							if($period < 14){
+								$result = $days[$t_day] . ' at ';
+								if($t_h > 12)
+									$result .= $t_h - 12;
+								else $result .= $t_h;
+								$result .= ':' . $t_m;
+								if($t_h>=12)
+									$result .= 'pm';
+								else $result .= 'am';
+							}
+							else{
+								$result = $months[$t_m-1] . ' ' . $t_d;
+							}
+						}
+					}
+					else{
+						if($period < 14){
+							$result = $days[$t_day] . ' at ';
+							if($t_h > 12)
+								$result .= $t_h - 12;
+							else $result .= $t_h;
+							$result .= ':' . $t_m;
+							if($t_h>=12)
+								$result .= 'pm';
+							else $result .= 'am';
+						}
+						else{
+							$result = $months[$t_m-1] . ' ' . $t_d;
+						}
+					}
+ 				}
+			}
+			else if($d == $t_d){
+				if($h > $t_h){
+					$period = $h - $t_h;
+					if($period == 1)
+						$result = 'an hour ago';
+					else $result = $period . ' hours ago';
+				}
+				else if($h == $t_h){
+					if($i > $t_i){
+						$period = $i - $t_i;
+						if($period == 1)
+							$result = 'a minute ago';
+						else $result = $period . ' minutes ago';
+					}
+					else if($i == $t_i){
+						if($s > $t_s){
+							$period = $s - $t_s;
+							if($period == 1)
+								$result = 'a moment ago';
+							else $result = $period . ' seconds ago';
+						}
+						else if($s == $t_s){
+							$result = 'a moment ago';
+						}
+					}
+				}
+			}
+		}
+	}
+	return $result;
+ }
+ function is_email($email){
+	$regex = '/^[_a-z0-9-]+(\.[_a-z0-9-]+)*@[a-z0-9-]+(\.[a-z0-9-]+)*(\.[a-z]{2,3})$/'; 
+	if (preg_match($regex, $email))
+		return true;
+	else
+		return false;
+ }
+ function frender($file, $vars=null){
+    if (is_array($vars) && !empty($vars)) {
+        extract($vars);
+    }
+    ob_start();
+    include $file;
+    return ob_get_clean();
+ }
+ 
+ function can_create_projects($author){
+ 	if($author->uid == 1) return true;
+ 	if(!isset($author->field_permissions['und']))
+ 		return false;
+ 	foreach($author->field_permissions['und'] as $value)
+ 		if($value['value'] == 'Create')
+ 			return true;
+ 	return false;
+ }
+ 
+ function can_admin($author){
+ 	if($author->uid == 1) return true;
+  	if(!isset($author->field_permissions['und']))
+ 		return false;
+ 	foreach($author->field_permissions['und'] as $value)
+ 		if($value['value'] == 'Admin')
+ 			return true;
+ 	return false;
+ }
+ 
+ function can_billing($author){
+ 	if($author->uid == 1) return true;
+  	if(!isset($author->field_permissions['und']))
+ 		return false;
+ 	foreach($author->field_permissions['und'] as $value)
+ 		if($value['value'] == 'Billing')
+ 			return true;
+ 	return false;
+ }
+ function get_status_like($flag,$id){
+     global $user;
+     switch($flag){
+         case 'project':
+             $status = db_query("SELECT field_project_staff_picks_value FROM field_data_field_project_staff_picks WHERE entity_id= $id")->fetchField();
+             return $status;
+             break;
+         
+     }
+ }
+function get_files_infolder($flag,$folder_id, $is_client = 0, $limit = '', $id = 0, $tid = 0, $aid = 0, $fid = 0) {
+    $list_files = array();
+    global $user;
+    switch ($flag) {
+        case 'project':
+            $attachfiles = db_query("SELECT * FROM tbl_files WHERE nid = $id AND deleted = 0 AND folder_id=$folder_id ORDER BY created desc " . $limit);
+            foreach ($attachfiles as $file) {
+                $info_label = db_query("SELECT * FROM tbl_file_label WHERE fid=$file->fid");
+                foreach ($info_label as $label) {
+                    $file->labels[] = $label;
+                }
+                if ($file->tid > 0 && $file->aid == 0) {
+                    $file->send_client = db_query("SELECT send_client FROM tbl_todolist WHERE tid=$file->tid")->fetchField();
+                    $file->number_comment = db_query("SELECT count (*) FROM tbl_project_comment WHERE tid = $file->tid AND aid=0 AND deleted=0")->fetchField();
+                } else {
+                    $file->send_client = db_query("SELECT send_client FROM tbl_project_attribute WHERE aid=$file->aid")->fetchField();
+                    $file->number_comment = db_query("SELECT count (*) FROM tbl_project_comment WHERE aid = $file->aid AND deleted=0")->fetchField();
+                }
+
+
+                if ($is_client == 1 && $file->send_client == 1) {
+                    $list_files[] = $file;
+                } else if ($is_client == 0) {
+                    $list_files[] = $file;
+                }
+            }
+            return $list_files;
+            break;
+        case 'file':
+            $attachfiles = db_query("SELECT * FROM tbl_files WHERE fid= $fid AND deleted = 0 AND folder_id=$folder_id ORDER BY created desc " . $limit);
+            foreach ($attachfiles as $file) {
+                $info_label = db_query("SELECT * FROM tbl_file_label WHERE fid=$file->fid");
+                foreach ($info_label as $label) {
+                    $file->labels[] = $label;
+                }
+                if ($file->tid > 0 && $file->aid == 0) {
+                    $file->send_client = db_query("SELECT send_client FROM tbl_todolist WHERE tid=$file->tid")->fetchField();
+                    $file->number_comment = db_query("SELECT count (*) FROM tbl_project_comment WHERE tid = $file->tid AND aid=0 AND deleted=0")->fetchField();
+                } else {
+                    $file->send_client = db_query("SELECT send_client FROM tbl_project_attribute WHERE aid=$file->aid")->fetchField();
+                    $file->number_comment = db_query("SELECT count (*) FROM tbl_project_comment WHERE aid = $file->aid AND deleted=0")->fetchField();
+                }
+
+                $list_files[] = $file;
+            }
+            return $list_files;
+            break;
+        case 'user':
+            $attachfiles = db_query("SELECT * FROM tbl_files WHERE uid= $id AND  folder_id=$folder_id ANDdeleted = 0 ORDER BY created desc " . $limit);
+            foreach ($attachfiles as $file) {
+                $info_label = db_query("SELECT * FROM tbl_file_label WHERE fid=$file->fid");
+                foreach ($info_label as $label) {
+                    $file->labels[] = $label;
+                }
+                if ($file->tid > 0 && $file->aid == 0) {
+                    $file->send_client = db_query("SELECT send_client FROM tbl_project_attribute WHERE tid=$file->tid")->fetchField();
+                    $file->number_comment = db_query("SELECT count (*) FROM tbl_project_comment WHERE tid = $file->tid AND aid=0 AND deleted=0")->fetchField();
+                } else {
+                    $file->send_client = db_query("SELECT send_client FROM tbl_project_attribute WHERE aid=$file->aid")->fetchField();
+                    $file->number_comment = db_query("SELECT count (*) FROM tbl_project_comment WHERE aid = $file->aid AND deleted=0")->fetchField();
+                }
+
+                $list_files[] = $file;
+            }
+            return $list_files;
+            break;
+             case 'groups':
+            $attachfiles = db_query("SELECT * FROM tbl_files WHERE nid IN (".implode(",",$id).") AND deleted = 0 AND folder_id=$folder_id ORDER BY created desc " . $limit);
+            foreach ($attachfiles as $file) {
+                $info_label = db_query("SELECT * FROM tbl_file_label WHERE fid=$file->fid");
+                foreach ($info_label as $label) {
+                    $file->labels[] = $label;
+                }
+                if ($file->tid > 0 && $file->aid == 0) {
+                    $file->send_client = db_query("SELECT send_client FROM tbl_todolist WHERE tid=$file->tid")->fetchField();
+                    $file->number_comment = db_query("SELECT count (*) FROM tbl_project_comment WHERE tid = $file->tid AND aid=0 AND deleted=0")->fetchField();
+                } else {
+                    $file->send_client = db_query("SELECT send_client FROM tbl_project_attribute WHERE aid=$file->aid")->fetchField();
+                    $file->number_comment = db_query("SELECT count (*) FROM tbl_project_comment WHERE aid = $file->aid AND deleted=0")->fetchField();
+                }
+
+
+                if ($is_client == 1 && $file->send_client == 1) {
+                    $list_files[] = $file;
+                } else if ($is_client == 0) {
+                    $list_files[] = $file;
+                }
+            }
+            return $list_files;
+            break;
+    }
+}
